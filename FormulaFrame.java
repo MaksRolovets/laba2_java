@@ -16,6 +16,7 @@
         private Box hboxFormulaType = Box.createHorizontalBox();
         private int formulaId = 1;
 
+        private Double lastResult = null;
         private Double sum = 0.0;
 
         public FormulaFrame() {
@@ -67,9 +68,13 @@
             JButton buttonMPlus = new JButton("M+");
             buttonMPlus.addActionListener(e -> {
                 try {
-                    Double val = Double.parseDouble(textFieldResult.getText());
-                    sum += val;
+                    if (lastResult == null){
+                        JOptionPane.showMessageDialog(this, "Сначала выполните вычисление", "Нет результата", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    sum += lastResult;
                     textFieldResult.setText(sum.toString());
+                    lastResult = sum;
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(this, "Ошибка при добавлении к сумме");
                 }
@@ -119,6 +124,7 @@
                 else
                     result = formula2(x, y, z);
 
+                lastResult = result;
                 textFieldResult.setText(String.format("%.5f", result));
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Ошибка вычислений: " + ex.getMessage(),
