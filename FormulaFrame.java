@@ -1,7 +1,7 @@
 
     import javax.swing.*;
     import java.awt.*;
-    import java.awt.event.*;
+
 
     public class FormulaFrame extends JFrame {
         private static final int WIDTH = 500;
@@ -16,7 +16,8 @@
         private Box hboxFormulaType = Box.createHorizontalBox();
         private int formulaId = 1;
 
-        private Double lastResult = null;
+        private Double lastResult_1 = null;
+        private Double lastResult_2 = null;
         private Double sum = 0.0;
 
         public FormulaFrame() {
@@ -68,13 +69,23 @@
             JButton buttonMPlus = new JButton("M+");
             buttonMPlus.addActionListener(e -> {
                 try {
-                    if (lastResult == null){
-                        JOptionPane.showMessageDialog(this, "Сначала выполните вычисление", "Нет результата", JOptionPane.WARNING_MESSAGE);
-                        return;
+                    if (formulaId == 1){
+                        if (lastResult_1 == null){
+                            JOptionPane.showMessageDialog(this, "Сначала выполните вычисление", "Нет результата", JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                        sum += lastResult_1;
+                        textFieldResult.setText(sum.toString());
+                        lastResult_1 = sum;
+                    }if (formulaId == 2){
+                        if (lastResult_2 == null){
+                            JOptionPane.showMessageDialog(this, "Сначала выполните вычисление", "Нет результата", JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                        sum += lastResult_2;
+                        textFieldResult.setText(sum.toString());
+                        lastResult_2 = sum;
                     }
-                    sum += lastResult;
-                    textFieldResult.setText(sum.toString());
-                    lastResult = sum;
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(this, "Ошибка при добавлении к сумме");
                 }
@@ -83,6 +94,8 @@
             JButton buttonMC = new JButton("MC");
             buttonMC.addActionListener(e -> {
                 sum = 0.0;
+                lastResult_1 = null;
+                lastResult_2 = null;
                 textFieldResult.setText("0");
             });
 
@@ -107,7 +120,13 @@
 
         private void addRadioButton(String name, final int formulaId) {
             JRadioButton button = new JRadioButton(name);
-            button.addActionListener(e -> this.formulaId = formulaId);
+            button.addActionListener(e -> {
+                if (formulaId == 1){lastResult_1 = null;}
+                else{lastResult_2 = null;}
+                this.formulaId = formulaId;
+                textFieldResult.setText("0");
+
+            });
             radioButtons.add(button);
             hboxFormulaType.add(button);
         }
@@ -119,12 +138,14 @@
                 double z = Double.parseDouble(textFieldZ.getText());
                 double result;
 
-                if (formulaId == 1)
+                if (formulaId == 1) {
                     result = formula1(x, y, z);
-                else
+                    lastResult_1 = result;
+                }
+                else{
                     result = formula2(x, y, z);
-
-                lastResult = result;
+                    lastResult_2 = result;
+                }
                 textFieldResult.setText(String.format("%.5f", result));
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Ошибка вычислений: " + ex.getMessage(),
@@ -134,15 +155,13 @@
 
         // Формула №1
         private double formula1(double x, double y, double z) {
-            return Math.pow(Math.cos(y * z), 4)
-                    + Math.exp(x)
-                    + Math.log(1 + y)
-                    + Math.pow(Math.cos(x), 2);
+            return Math.pow(Math.cos(Math.PI*Math.pow(x,3)) + Math.pow(Math.log(1+y), 2), 0.25)
+                    * (Math.pow(Math.pow(Math.exp(x), z), 2)+Math.sqrt(1/x)+Math.cos(Math.pow(Math.E, y)));
         }
 
         // Формула №2
         private double formula2(double x, double y, double z) {
-            return x / (Math.pow(x, 3) + Math.log(z * y + 1));
+            return Math.pow(x,x) / (Math.sqrt((Math.pow(y, 3) + 1)));
         }
     }
 
